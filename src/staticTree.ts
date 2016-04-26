@@ -23,7 +23,7 @@ export interface ActionDescription {
   }
 }
 
-export type ChainDescription = Array<ActionDescription | ActionDescription[]> 
+export type Branch = Array<ActionDescription | ActionDescription[]> 
 
 function getFunctionName (fn: any) {
   var ret = fn.toString()
@@ -32,7 +32,7 @@ function getFunctionName (fn: any) {
   return ret
 }
 
-function traverse (path: Path, actions: ActionFunc[], item: Chain | ParallelActions, isChain: boolean): ChainDescription
+function traverse (path: Path, actions: ActionFunc[], item: Chain | ParallelActions, isChain: boolean): Branch
 function traverse (path: Path, actions: ActionFunc[], item: ActionFunc, outputs: ActionOutputs, isSync: boolean): ActionDescription
 function traverse (path: Path, actions: ActionFunc[], item: any, isChain?: any, isSync?: boolean): any {
   if (Array.isArray(item) && typeof isChain === 'boolean') {
@@ -60,11 +60,13 @@ function traverse (path: Path, actions: ActionFunc[], item: any, isChain?: any, 
     let outputs: ActionOutputs = isChain as ActionOutputs
     let action: ActionDescription = {
       name: actionFunc.displayName || getFunctionName(actionFunc),
-      isAsync: !!actionFunc.async || !isSync,
+      isAsync: !!actionFunc.async,
       path: path.slice(),
-      actionIndex: actions.indexOf(actionFunc) === -1 ? actions.push(actionFunc) : actions.indexOf(actionFunc)
+      actionIndex: actions.indexOf(actionFunc) === -1 ? (actions.push(actionFunc) - 1) : actions.indexOf(actionFunc)
     }
-    
+    if (!isSync && !action.isAsync) {
+      throw new Error('Only async actions is allowed to be in ParallelActions array')
+    }
     if (outputs) {
       action.outputs = {}
       Object.keys(outputs).forEach(function (key) {
@@ -82,4 +84,11 @@ function traverse (path: Path, actions: ActionFunc[], item: any, isChain?: any, 
   }
 }
 
-export default traverse
+export default function (signalChain: Chain) {
+  let actions: ActionFunc[] = []
+  var branches = traverse([], actions, signalChain, true)
+  return {
+    branches: branches,
+    actions: actions
+  }
+}

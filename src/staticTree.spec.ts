@@ -1,6 +1,5 @@
-import traverse, { ActionFunc, Chain } from './staticTree'
+import staticTree, { ActionFunc, Chain } from './staticTree'
 
-// TEST
 function sync (name: string) { 
   let action: ActionFunc = () => {}
   action.displayName = name
@@ -20,7 +19,7 @@ let signalChain: Chain = [
   },
   [
     // [ sync('error') ],
-    sync('c'), // will be async anyway
+    // sync('c'), runtime error
     async('d'), {
       'foo': [ sync('d.foo.a'), async('d.foo.b') ],
       'bar': [ sync('d.bar.a'), async('d.bar.b'), {
@@ -32,8 +31,4 @@ let signalChain: Chain = [
   // { 'foo': [] } // runtime error only
 ]
 
-
-let actions: ActionFunc[] = []
-console.log(JSON.stringify(traverse([], actions, signalChain, true), null, 2))
-// console.log(traverse([], actions, signalChain, true))
-console.log(actions)
+console.log(JSON.stringify(staticTree(signalChain).branches, null, 2))
