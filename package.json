@@ -4,13 +4,16 @@
   "description": "",
   "scripts": {
     "pretest": "npm run build",
-    "test": "node lib/staticTree.spec",
+    "test": "node lib/createSignal.spec",
+    "prebuild": "typings install",
     "build": "tsc",
     "watch": "tsc -w"
   },
   "author": "Alexey Gurianov <gurianov@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^1.8.10"
+    "tslint": "^3.8.1",
+    "typescript": "^1.8.10",
+    "typings": "^0.8.1"
   }
 }

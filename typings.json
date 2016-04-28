@@ -1,0 +1,8 @@
+{
+  "name": "cerebral-component",
+  "version": false,
+  "dependencies": {},
+  "ambientDependencies": {
+    "node": "registry:env/node#4.0.0+20160410231109"
+  }
+}

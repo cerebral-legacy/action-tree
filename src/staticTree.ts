@@ -1,29 +1,4 @@
-export type Chain = Array<ChainItem>
-export type ChainItem = ActionFunc | ActionOutputs | ParallelActions
-export type ParallelActions = Array<ActionFunc | ActionOutputs>
-export type Path = Array<string | number>
-
-export interface ActionFunc {
-  (context: any): void
-  async?: boolean
-  displayName?: string
-}
-
-export interface ActionOutputs {
-  [key: string]: Chain
-}
-
-export interface ActionDescription {
-  name: string
-  isAsync: boolean
-  path: Path
-  actionIndex: number
-  outputs?: {
-    [key: string]: any
-  }
-}
-
-export type Branch = Array<ActionDescription | ActionDescription[]> 
+import { ActionDescription, ActionFunc, ActionOutputs, Branch, Chain, ChainItem, ParallelActions, Path } from './interfaces'
 
 function getFunctionName (fn: any) {
   var ret = fn.toString()

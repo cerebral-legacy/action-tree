@@ -1,4 +1,5 @@
-import staticTree, { ActionFunc, Chain } from './staticTree'
+import { ActionFunc, Chain } from './interfaces' 
+import staticTree from './staticTree'
 
 function sync (name: string) { 
   let action: ActionFunc = () => {}

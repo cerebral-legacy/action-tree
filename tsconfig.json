@@ -5,10 +5,12 @@
     "noImplicitAny": true,
     "module": "commonjs",
     "outDir": "lib",
-    "target": "es5"
+    "target": "es6"
   },
   "exclude": [
     "node_modules",
+    "typings/browser",
+    "typings/browser.d.ts",
     "lib"
   ]
 }
