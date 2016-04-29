@@ -1,6 +1,8 @@
 import staticTree from './staticTree'
 import createContext from './createContext'
 import { ActionDescription, ActionResult, Branch, Chain, ExtendContextFunc, Signal, SignalCallback } from './interfaces'
+import Promise = require('core-js/library/fn/promise')
+import assign = require('core-js/library/fn/object/assign')
 
 const TIMEOUT = 3000
 
@@ -12,13 +14,13 @@ export default function createSignal<T> (
 ): Signal<T> {
   let tree = staticTree(signalChain)
 
-  return async function signal (signalPayload: T): Promise<any> {
+  return function signal (signalPayload: T): Promise<any> {
     callback && callback({ name: 'signalStart', payload: signalPayload })
 
-    async function runAction (action: ActionDescription, payload: T): Promise<T> {
+    function runAction (action: ActionDescription, payload: T): Promise<T> {
       callback && callback({ name: 'actionStart', action: action, payload: payload })
 
-      let result = await new Promise<ActionResult<T>>((resolve, reject) => {
+      return new Promise<ActionResult<T>>((resolve, reject) => {
         let actionFunc = tree.actions[action.actionIndex]
         let timeout = action.isAsync && setTimeout(() => { reject() }, TIMEOUT)
 
@@ -29,7 +31,7 @@ export default function createSignal<T> (
 
         function outputFn (path: string, newPayload: T) {
           result.path = path
-          result.payload = Object.assign({}, result.payload, newPayload)
+          result.payload = assign({}, result.payload, newPayload)
 
           if (action.isAsync) {
             clearTimeout(timeout)
@@ -40,18 +42,18 @@ export default function createSignal<T> (
         actionFunc(createContext<T>(action, payload, outputFn))
 
         if (!action.isAsync) { resolve(result) }
+      }).then((result) => {
+        callback && callback({ name: 'actionEnd', action: action, payload: result.payload })
+
+        if (result.path) {
+          return runBranch(action.outputs[result.path], 0, result.payload)
+        } else {
+          return result.payload
+        }
       })
-
-      callback && callback({ name: 'actionEnd', action: action, payload: result.payload })
-
-      if (result.path) {
-        return await runBranch(action.outputs[result.path], 0, result.payload)
-      } else {
-        return result.payload
-      }
     }
 
-    async function runBranch (branch: Branch, index: number, payload: T): Promise<T> {
+    function runBranch (branch: Branch, index: number, payload: T): Promise<T> {
       let currentItem = branch[index]
 
       function runNextItem (result: T) {
@@ -62,21 +64,22 @@ export default function createSignal<T> (
         return Promise.resolve(payload)
       } else if (/* ParallelActions */Array.isArray(currentItem)) {
         let resultAll: T
-        let promises = currentItem.map(async (action: ActionDescription) => {
-          let promise = runAction(action, payload)
-          resultAll = Object.assign({}, payload, await promise)
-          return promise
+        let promises = currentItem.map((action: ActionDescription) => {
+          return runAction(action, payload).then((newPayload) => {
+            resultAll = assign({}, payload, newPayload)
+            return newPayload 
+          })
         })
 
-        await Promise.all(promises)
-        return await runNextItem(resultAll)
+        return Promise.all(promises).then(() => resultAll).then(runNextItem)
       } else {
-        return await runNextItem(await runAction(currentItem, payload))
+        return runAction(currentItem, payload).then(runNextItem)
       }
     }
 
-    let result = await runBranch(tree.branches, 0, signalPayload)
-    callback && callback({ name: 'signalEnd', payload: result })
-    return result
+    return runBranch(tree.branches, 0, signalPayload).then((result) => {
+      callback && callback({ name: 'signalEnd', payload: result })
+      return result
+    })
   }
 }

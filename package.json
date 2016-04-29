@@ -15,5 +15,8 @@
     "tslint": "^3.8.1",
     "typescript": "^1.8.10",
     "typings": "^0.8.1"
+  },
+  "dependencies": {
+    "core-js": "^2.3.0"
   }
 }
