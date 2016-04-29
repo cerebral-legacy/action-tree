@@ -24,15 +24,9 @@ export default function executeTree<T> (
     if (/* end of Branch */!currentItem) {
       return Promise.resolve(payload)
     } else if (/* ParallelActions */Array.isArray(currentItem)) {
-      let resultAll: T
-      let promises = currentItem.map((action: ActionDescription) => {
-        return runAction(action, payload).then((newPayload) => {
-          resultAll = assign({}, payload, newPayload)
-          return newPayload
-        }).then(resolveActionOutput)
-      })
-
-      return Promise.all(promises).then(() => resultAll).then(runNextItem)
+      return Promise.all(currentItem.map((action: ActionDescription) => runAction(action, payload).then(resolveActionOutput)))
+        .then((results) => assign({}, ...results))
+        .then(runNextItem)
     } else {
       return runAction(currentItem, payload).then(resolveActionOutput).then(runNextItem)
     }

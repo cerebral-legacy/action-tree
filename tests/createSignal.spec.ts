@@ -13,9 +13,11 @@ function async (fn: ActionFunc): ActionFunc {
   return aFn
 }
 
+let i = 0
+
 let aAction: ActionFunc = function aAction (ctx) {
   setTimeout(function() {
-    ctx.output({ foo: ctx.input.foo.concat('aAction') })
+    ctx.output({ [++i]: 'aAction' })
   }, 200);
 }
 aAction.async = true
@@ -29,8 +31,8 @@ let signalChain: Chain = [
   },
   [
     aAction,
-    async((ctx) => { ctx.output() }),
-    async((ctx) => { ctx.output.bar() }), {
+    async((ctx) => { ctx.output({ bar: 'baz' }) }),
+    async((ctx) => { ctx.output.bar({ baz: 'foo' }) }), {
       'foo': [ (ctx) => { } ],
       'bar': [ (ctx) => { ctx.output({ foo: ctx.input.foo.concat('5') }) }, aAction ],
     }
@@ -41,7 +43,7 @@ let signalChain: Chain = [
 function cb (event: SignalEvent<any>) {
   let action = event.action
   console.log(`${event.name}:`)
-  if (action) console.log(`index: ${action.actionIndex}, path: ${action.path}, foo: ${event.payload.foo}`)
+  console.log(`index: ${action.actionIndex}, path: ${action.path}, foo: ${event.payload.foo}`)
 }
 
 interface Payload {

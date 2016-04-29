@@ -6,9 +6,10 @@
   "typings": "lib/index.d.ts",
   "scripts": {
     "clean": "rimraf lib && rimraf tests/*.js*",
-    "prebuild": "typings install",
-    "build": "tsc && tsc --outDir tests tests/createSignal.spec.ts --sourceMap typings/main.d.ts",
-    "pretest": "npm run build",
+    "prebuild": "npm run clean && typings install",
+    "build": "tsc",
+    "build:tests": "tsc --lib es5,dom,es2015.promise --sourceMap --outDir tests tests/createSignal.spec.ts typings/main.d.ts",
+    "pretest": "npm run build && npm run build:tests",
     "test": "node tests/createSignal.spec.js",
     "prepublish": "npm run build",
     "watch": "tsc -w"

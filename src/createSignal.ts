@@ -1,7 +1,7 @@
 import staticTree from './staticTree'
 import createContext from './createContext'
 import executeTree from './executeTree'
-import { ActionDescription, ActionResult, Branch, Chain, ExtendContextFunc, Signal, SignalCallback } from './interfaces'
+import { ActionDescription, ActionResult, Chain, ExtendContextFunc, Signal, SignalCallback } from './interfaces'
 import assign = require('object-assign')
 
 const TIMEOUT = 3000
