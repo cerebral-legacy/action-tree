@@ -2,8 +2,7 @@ import staticTree from './staticTree'
 import createContext from './createContext'
 import executeTree from './executeTree'
 import { ActionDescription, ActionResult, Branch, Chain, ExtendContextFunc, Signal, SignalCallback } from './interfaces'
-import * as Promise from 'core-js/library/fn/promise'
-import * as assign from 'core-js/library/fn/object/assign'
+import assign = require('object-assign')
 
 const TIMEOUT = 3000
 

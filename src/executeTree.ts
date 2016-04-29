@@ -1,7 +1,5 @@
 import { Branch, ActionContext, ActionDescription, ActionResult } from './interfaces'
-import * as Promise from 'core-js/library/fn/promise'
-import * as assign from 'core-js/library/fn/object/assign'
-
+import assign = require('object-assign')
 
 export default function executeTree<T> (
   branches: Branch,

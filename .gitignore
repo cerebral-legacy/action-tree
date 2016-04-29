@@ -1,4 +1,5 @@
 node_modules
-typings
+typings/*
+!typings/fix.d.ts
 lib
 tests/*.js*

@@ -1,8 +1,7 @@
 {
   "name": "cerebral-component",
   "version": false,
-  "dependencies": {},
-  "ambientDependencies": {
-    "core-js": "registry:dt/core-js#0.0.0+20160317120654"
+  "dependencies": {
+    "object-assign": "registry:npm/object-assign#4.0.1+20160301180549"
   }
 }

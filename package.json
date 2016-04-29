@@ -18,11 +18,11 @@
   "devDependencies": {
     "rimraf": "^2.5.2",
     "ts-node": "^0.7.2",
-    "typescript": "^1.8.10",
+    "typescript": "^1.9.0-dev.20160429",
     "typings": "^0.8.1"
   },
   "dependencies": {
-    "core-js": "^2.3.0"
+    "object-assign": "^4.0.1"
   },
   "files": [
     "lib"
