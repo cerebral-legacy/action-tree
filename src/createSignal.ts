@@ -15,8 +15,6 @@ export default function createSignal<T> (
   let tree = staticTree(signalChain)
 
   return function signal (signalPayload: T): Promise<any> {
-    callback && callback({ name: 'signalStart', payload: signalPayload })
-
     function runAction (action: ActionDescription, payload: T): Promise<T> {
       callback && callback({ name: 'actionStart', action: action, payload: payload })
 
@@ -77,9 +75,6 @@ export default function createSignal<T> (
       }
     }
 
-    return runBranch(tree.branches, 0, signalPayload).then((result) => {
-      callback && callback({ name: 'signalEnd', payload: result })
-      return result
-    })
+    return runBranch(tree.branches, 0, signalPayload)
   }
 }

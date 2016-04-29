@@ -30,9 +30,9 @@ export interface Signal<T> {
 }
 
 export interface SignalEvent<T> {
-  name: 'signalStart' | 'signalEnd' | 'actionStart' | 'actionEnd',
+  name: 'actionStart' | 'actionEnd',
   payload: T,
-  action?: ActionDescription
+  action: ActionDescription
 }
 
 export interface SignalCallback<T> {
