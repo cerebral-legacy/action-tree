@@ -1,5 +1,5 @@
-import { ActionFunc, Chain, SignalEvent } from './interfaces'
-import createSignal from './createSignal'
+import { ActionFunc, Chain, SignalEvent } from '..'
+import { createSignal } from '..'
 
 interface Action extends ActionFunc {
   (ctx: any): void

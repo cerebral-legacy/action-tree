@@ -1,22 +1,30 @@
 {
-  "name": "cerebral-component",
+  "name": "signal-tree",
   "version": "0.1.0",
-  "description": "",
+  "description": "A JavaScript execution controller",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "scripts": {
-    "pretest": "npm run build",
-    "test": "node lib/createSignal.spec",
+    "clean": "rimraf lib && rimraf tests/*.js*",
     "prebuild": "typings install",
-    "build": "tsc",
+    "build": "tsc && tsc --outDir tests tests/*.ts --sourceMap typings/main.d.ts",
+    "pretest": "npm run build",
+    "test": "node tests/createSignal.spec.js",
+    "prepublish": "build",
     "watch": "tsc -w"
   },
   "author": "Alexey Gurianov <gurianov@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "tslint": "^3.8.1",
+    "rimraf": "^2.5.2",
+    "ts-node": "^0.7.2",
     "typescript": "^1.8.10",
     "typings": "^0.8.1"
   },
   "dependencies": {
     "core-js": "^2.3.0"
-  }
+  },
+  "files": [
+    "lib"
+  ]
 }

@@ -1,8 +1,8 @@
 import staticTree from './staticTree'
 import createContext from './createContext'
 import { ActionDescription, ActionResult, Branch, Chain, ExtendContextFunc, Signal, SignalCallback } from './interfaces'
-import Promise = require('core-js/library/fn/promise')
-import assign = require('core-js/library/fn/object/assign')
+import * as Promise from 'core-js/library/fn/promise'
+import * as assign from 'core-js/library/fn/object/assign'
 
 const TIMEOUT = 3000
 
