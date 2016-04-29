@@ -7,10 +7,10 @@
   "scripts": {
     "clean": "rimraf lib && rimraf tests/*.js*",
     "prebuild": "typings install",
-    "build": "tsc && tsc --outDir tests tests/*.ts --sourceMap typings/main.d.ts",
+    "build": "tsc && tsc --outDir tests tests/createSignal.spec.ts --sourceMap typings/main.d.ts",
     "pretest": "npm run build",
     "test": "node tests/createSignal.spec.js",
-    "prepublish": "build",
+    "prepublish": "npm run build",
     "watch": "tsc -w"
   },
   "author": "Alexey Gurianov <gurianov@gmail.com>",
