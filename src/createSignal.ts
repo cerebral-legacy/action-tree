@@ -1,24 +1,26 @@
 import staticTree from './staticTree'
 import createContext from './createContext'
-import { ActionDescription, ActionResult, Branch, Chain, Signal, SignalCallback } from './interfaces'
+import { ActionDescription, ActionResult, Branch, Chain, ExtendContextFunc, Signal, SignalCallback } from './interfaces'
 
 const TIMEOUT = 3000
 
+/** Signal factory */
 export default function createSignal<T> (
   signalChain: Chain,
-  callback?: SignalCallback<T>
+  callback?: SignalCallback<T>,
+  extendContext?: ExtendContextFunc<T>
 ): Signal<T> {
   let tree = staticTree(signalChain)
 
-  return async function signal (signalPayload: T, extendContext?: any): Promise<any> {
-    callback('signalStart', { payload: signalPayload })
+  return async function signal (signalPayload: T): Promise<any> {
+    callback && callback({ name: 'signalStart', payload: signalPayload })
 
     async function runAction (action: ActionDescription, payload: T): Promise<T> {
-      callback('actionStart', { action: action, payload: payload })
+      callback && callback({ name: 'actionStart', action: action, payload: payload })
 
       let result = await new Promise<ActionResult<T>>((resolve, reject) => {
         let actionFunc = tree.actions[action.actionIndex]
-        let timeout = action.isAsync && setTimeout(() => { reject() }, 3000)
+        let timeout = action.isAsync && setTimeout(() => { reject() }, TIMEOUT)
 
         let result: ActionResult<T> = {
           path: null,
@@ -35,12 +37,12 @@ export default function createSignal<T> (
           }
         }
 
-        actionFunc(createContext<T>({ action: action, payload: payload }, outputFn))
+        actionFunc(createContext<T>(action, payload, outputFn))
 
         if (!action.isAsync) { resolve(result) }
       })
 
-      callback('actionEnd', { action: action, payload: result.payload })
+      callback && callback({ name: 'actionEnd', action: action, payload: result.payload })
 
       if (result.path) {
         return await runBranch(action.outputs[result.path], 0, result.payload)
@@ -74,7 +76,7 @@ export default function createSignal<T> (
     }
 
     let result = await runBranch(tree.branches, 0, signalPayload)
-    callback('signalEnd', { payload: result })
+    callback && callback({ name: 'signalEnd', payload: result })
     return result
   }
 }

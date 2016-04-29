@@ -30,12 +30,17 @@ export interface Signal<T> {
 }
 
 export interface SignalEvent<T> {
+  name: 'signalStart' | 'signalEnd' | 'actionStart' | 'actionEnd',
   payload: T,
   action?: ActionDescription
 }
 
 export interface SignalCallback<T> {
-  (eventName: 'signalStart' | 'signalEnd' | 'actionStart' | 'actionEnd', eventData: SignalEvent<T>): void
+  (event: SignalEvent<T>): void
+}
+
+export interface ExtendContextFunc<T> {
+  (ctx: ActionContext<T>, action: ActionDescription, payload: T): ActionContext<T>
 }
 
 export interface ActionOutput<T> {

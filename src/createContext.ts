@@ -1,22 +1,21 @@
-import { SignalEvent, ActionContext, ActionOutput } from './interfaces'
+import { ActionContext, ActionDescription, ActionOutput, ExtendContextFunc } from './interfaces'
 
 export default function createContext<T> (
-  actionEvent: SignalEvent<T>,
+  action: ActionDescription,
+  payload: T,
   outputFn: (path: string, payload: T) => void,
-  extendContext?: (ctx: ActionContext<T>, actionEvent: SignalEvent<T>) => ActionContext<T>
+  extendContext?: ExtendContextFunc<T>
 ) {
-  let output = (Object.keys(actionEvent.action.outputs || {}))
+  let output = (Object.keys(action.outputs || {}))
     .reduce<ActionOutput<T>>(function (next, key) {
       next[key] = outputFn.bind(null, key)
       return next
     }, outputFn.bind(null, null))
 
   let ctx: ActionContext<T> = {
-    input: actionEvent.payload,
+    input: payload,
     output: output
   }
 
-  return extendContext
-    ? extendContext(ctx, actionEvent)
-    : ctx
+  return extendContext ? extendContext(ctx, action, payload) : ctx
 }

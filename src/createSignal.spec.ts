@@ -38,9 +38,9 @@ let signalChain: Chain = [
   (ctx) => { ctx.output({ foo: ctx.input.foo.concat('the end') }) }
 ]
 
-function cb (name: string, event: SignalEvent<any>) {
+function cb (event: SignalEvent<any>) {
   let action = event.action
-  console.log(`${name}:`)
+  console.log(`${event.name}:`)
   if (action) console.log(`index: ${action.actionIndex}, path: ${action.path}, foo: ${event.payload.foo}`)
 }
 
@@ -53,4 +53,7 @@ let signal = createSignal<Payload>(signalChain, cb)
 signal({ foo: ['bar'] }).then(function(result) {
   console.log('the end: ')
   console.log(result)
+}, function (error) {
+  console.log('error: ')
+  console.log(error)
 })
