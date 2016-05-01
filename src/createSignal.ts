@@ -29,7 +29,7 @@ export default function createSignal<T> (
         function outputFn (path: string, newPayload: T) {
           result.payload = assign({}, result.payload, newPayload)
           if (path) {
-            result.branch = action.outputs[path]
+            result.path = path
           }
 
           if (action.isAsync) {

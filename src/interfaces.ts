@@ -54,6 +54,6 @@ export interface ActionContext<T> {
 }
 
 export interface ActionResult<T> {
-  branch?: Branch
+  path?: string
   payload: T
 }
