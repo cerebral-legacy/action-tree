@@ -7,6 +7,7 @@ export interface ActionFunc {
   (context: any): void
   async?: boolean
   displayName?: string
+  outputs?: string[]
 }
 
 export interface ActionOutputs {

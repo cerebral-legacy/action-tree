@@ -24,15 +24,15 @@ function traverse (path: Path, actions: ActionFunc[], item: any, isChain?: any, 
       } else if (Array.isArray(item) && isChain) {
         return traverse(path, actions, subItem as ParallelActions, false)
       } else {
-        throw new Error('Unexpected entry in signal chain')
+        throw new Error('Signal Tree - Unexpected entry in signal chain')
       }
     }).filter(function (action) {
       // Removed ActionOutputs leaves null in the end of array
       return !!action
     })
   } else if (typeof item === 'function') {
-    let actionFunc: ActionFunc = item as ActionFunc
-    let outputs: ActionOutputs = isChain as ActionOutputs
+    let actionFunc: ActionFunc = item
+    let outputs: ActionOutputs = isChain
     let action: ActionDescription = {
       name: actionFunc.displayName || getFunctionName(actionFunc),
       isAsync: !!actionFunc.async,
@@ -40,11 +40,14 @@ function traverse (path: Path, actions: ActionFunc[], item: any, isChain?: any, 
       actionIndex: actions.indexOf(actionFunc) === -1 ? (actions.push(actionFunc) - 1) : actions.indexOf(actionFunc)
     }
     if (!isSync && !action.isAsync) {
-      throw new Error('Only async actions is allowed to be in ParallelActions array')
+      throw new Error('Signal Tree - Only async actions is allowed to be in ParallelActions array')
     }
     if (outputs) {
       action.outputs = {}
       Object.keys(outputs).forEach(function (key) {
+        if (actionFunc.outputs && !~actionFunc.outputs.indexOf(key)) {
+          throw new Error(`Signal Tree - Outputs object doesn\'t match list of possible outputs defined for action.`)
+        }
         path.push('outputs', key)
         action.outputs[key] = traverse(path, actions, outputs[key], true)
         path.pop()
@@ -55,7 +58,7 @@ function traverse (path: Path, actions: ActionFunc[], item: any, isChain?: any, 
     path.pop()
     return action
   } else {
-    throw new Error('Unexpected entry in signal chain')
+    throw new Error('Signal Tree - Unexpected entry in signal chain')
   }
 }
 
