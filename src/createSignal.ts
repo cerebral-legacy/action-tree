@@ -2,7 +2,6 @@ import staticTree from './staticTree'
 import createContext from './createContext'
 import executeTree from './executeTree'
 import { ActionDescription, ActionResult, Chain, ExtendContextFunc, Signal, SignalCallback } from './interfaces'
-import assign = require('object-assign')
 
 const TIMEOUT = 3000
 
@@ -22,14 +21,12 @@ export default function createSignal<T> (
         let actionFunc = tree.actions[action.actionIndex]
         let timeout = action.isAsync && setTimeout(() => { reject() }, TIMEOUT)
 
-        let result: ActionResult<T> = {
-          payload: payload
-        }
+        let result: ActionResult<T>
 
-        function outputFn (path: string, newPayload: T) {
-          result.payload = assign({}, result.payload, newPayload)
-          if (path) {
-            result.path = path
+        function outputFn (path: string, outputPayload: T) {
+          result = {
+            path: path,
+            payload: outputPayload
           }
 
           if (action.isAsync) {
