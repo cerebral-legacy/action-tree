@@ -4,6 +4,7 @@ export type ParallelActions = Array<Action | ActionOutputs>
 export type Branch = Array<ActionDescription | ActionDescription[]> 
 
 export interface Action {
+  (): void
   async?: boolean
   displayName?: string
   outputs?: string[]
@@ -16,7 +17,6 @@ export interface ActionOutputs {
 export interface ActionDescription {
   name: string
   isAsync: boolean
-  path: Array<string | number>
   actionIndex: number
   outputs?: {
     [key: string]: Branch

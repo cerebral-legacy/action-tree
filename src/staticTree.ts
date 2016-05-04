@@ -9,22 +9,21 @@ function getFunctionName (fn: any) {
   return ret
 }
 
-function traverse (path: Path, actions: Action[], item: Chain | ParallelActions, isChain: boolean): Branch
-function traverse (path: Path, actions: Action[], item: Action, outputs: ActionOutputs, isSync: boolean): ActionDescription
-function traverse (path: Path, actions: Action[], item: any, isChain?: any, isSync?: boolean): any {
+function traverse (actions: Action[], item: Chain | ParallelActions, isChain: boolean): Branch
+function traverse (actions: Action[], item: Action, outputs: ActionOutputs, isSync: boolean): ActionDescription
+function traverse (actions: Action[], item: any, isChain?: any, isSync?: boolean): any {
   if (Array.isArray(item) && typeof isChain === 'boolean') {
     return (item as Chain).map(function (subItem: ChainItem, index: number) {
-      path.push(index)
       if (typeof subItem === 'function') {
         let nextSubItem = item[index + 1]
         if (!Array.isArray(nextSubItem) && typeof nextSubItem === 'object') {
           item.splice(index + 1, 1)
-          return traverse(path, actions, subItem as Action, nextSubItem, isChain)
+          return traverse(actions, subItem as Action, nextSubItem, isChain)
         } else {
-          return traverse(path, actions, subItem as Action, null, isChain)
+          return traverse(actions, subItem as Action, null, isChain)
         }
       } else if (Array.isArray(item) && isChain) {
-        return traverse(path, actions, subItem as ParallelActions, false)
+        return traverse(actions, subItem as ParallelActions, false)
       } else {
         throw new Error('Signal Tree - Unexpected entry in signal chain')
       }
@@ -38,7 +37,6 @@ function traverse (path: Path, actions: Action[], item: any, isChain?: any, isSy
     let action: ActionDescription = {
       name: actionFunc.displayName || getFunctionName(actionFunc),
       isAsync: !!actionFunc.async,
-      path: path.slice(),
       actionIndex: actions.indexOf(actionFunc) === -1 ? (actions.push(actionFunc) - 1) : actions.indexOf(actionFunc)
     }
     if (!isSync && !action.isAsync) {
@@ -50,14 +48,10 @@ function traverse (path: Path, actions: Action[], item: any, isChain?: any, isSy
         if (actionFunc.outputs && !~actionFunc.outputs.indexOf(key)) {
           throw new Error(`Signal Tree - Outputs object doesn\'t match list of possible outputs defined for action.`)
         }
-        path.push('outputs', key)
-        action.outputs[key] = traverse(path, actions, outputs[key], true)
-        path.pop()
-        path.pop()
+        action.outputs[key] = traverse(actions, outputs[key], true)
       })
     }
 
-    path.pop()
     return action
   } else {
     throw new Error('Signal Tree - Unexpected entry in signal chain')
@@ -66,9 +60,9 @@ function traverse (path: Path, actions: Action[], item: any, isChain?: any, isSy
 
 export default function (signalChain: Chain) {
   let actions: Action[] = []
-  var branches = traverse([], actions, signalChain, true)
+  var tree = traverse(actions, signalChain, true)
   return {
-    branches: branches,
+    tree: tree,
     actions: actions
   }
 }

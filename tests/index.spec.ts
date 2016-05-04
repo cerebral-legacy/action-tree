@@ -39,11 +39,11 @@ let signalChain: Chain = [
 ]
 
 let tree = staticTree(signalChain)
-console.log(JSON.stringify(tree.branches, null, 2))
+console.log(JSON.stringify(tree.tree, null, 2))
 
 function runAction (action: ActionDescription, payload: any): Promise<ActionResult<any>> {
   let result: ActionResult<any> = {
-    payload: { [action.name]: action.path }
+    payload: { [action.name]: action.actionIndex }
   }
   if (action.outputs) {
     result.path = 'bar'
@@ -51,6 +51,6 @@ function runAction (action: ActionDescription, payload: any): Promise<ActionResu
   return Promise.resolve(result)
 }
 
-executeTree(tree.branches, runAction, { foo: 'bar' }).then((result) => {
+executeTree(tree.tree, runAction, { foo: 'bar' }).then((result) => {
   console.log(JSON.stringify(result, null, 2))
 })
