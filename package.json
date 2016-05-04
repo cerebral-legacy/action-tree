@@ -8,9 +8,9 @@
     "clean": "rimraf lib && rimraf tests/*.js*",
     "prebuild": "npm run clean && typings install",
     "build": "tsc",
-    "build:tests": "tsc --lib es5,dom,es2015.promise --sourceMap --outDir tests tests/createSignal.spec.ts typings/main.d.ts",
+    "build:tests": "tsc --lib es5,dom,es2015.promise --sourceMap --outDir tests tests/index.spec.ts typings/main.d.ts",
     "pretest": "npm run build && npm run build:tests",
-    "test": "node tests/createSignal.spec.js",
+    "test": "node tests/index.spec.js",
     "prepublish": "npm run build",
     "watch": "tsc -w"
   },

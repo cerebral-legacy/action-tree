@@ -1,4 +1,4 @@
-import { Branch, ActionContext, ActionDescription, ActionResult } from './interfaces'
+import { Branch, ActionDescription, ActionResult } from './interfaces'
 import assign = require('object-assign')
 
 /**

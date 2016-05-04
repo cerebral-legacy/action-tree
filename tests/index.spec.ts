@@ -1,8 +1,8 @@
-import { ActionFunc, Chain } from '..' 
-import { staticTree } from '..'
+import { Action, ActionDescription, ActionResult, Chain } from '..' 
+import { staticTree, executeTree } from '..'
 
 function sync (name: string) { 
-  let action: ActionFunc = () => {}
+  let action: Action = () => {}
   action.displayName = name
   return action
 }
@@ -27,9 +27,26 @@ let signalChain: Chain = [
         'foo': [ sync('d.bar.b.foo.a'), async('d.bar.b.foo.b') ],
         'bar': [ sync('d.bar.b.bar.a'), async('d.bar.b.bar.b') ]
       } ]
-    }
+    },
+    async('e'),
+    async('f')
   ],
   // { 'foo': [] } // runtime error only
 ]
 
-console.log(JSON.stringify(staticTree(signalChain).branches, null, 2))
+let tree = staticTree(signalChain)
+console.log(JSON.stringify(tree.branches, null, 2))
+
+function runAction (action: ActionDescription, payload: any): Promise<ActionResult<any>> {
+  let result: ActionResult<any> = {
+    payload: { [action.name]: action.path }
+  }
+  if (action.outputs) {
+    result.path = 'bar'
+  }
+  return Promise.resolve(result)
+}
+
+executeTree(tree.branches, runAction, { foo: 'bar' }).then((result) => {
+  console.log(JSON.stringify(result, null, 2))
+})
