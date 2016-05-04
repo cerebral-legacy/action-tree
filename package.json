@@ -1,7 +1,7 @@
 {
-  "name": "signal-tree",
+  "name": "action-tree",
   "version": "0.1.0",
-  "description": "A JavaScript execution controller",
+  "description": "Behaviour tree for JS applications",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
@@ -18,7 +18,6 @@
   "license": "MIT",
   "devDependencies": {
     "rimraf": "^2.5.2",
-    "ts-node": "^0.7.2",
     "typescript": "^1.9.0-dev.20160429",
     "typings": "^0.8.1"
   },
