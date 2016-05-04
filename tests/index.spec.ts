@@ -1,3 +1,7 @@
+/// <reference path="../node_modules/typescript/lib/lib.es5.d.ts" />
+/// <reference path="../node_modules/typescript/lib/lib.dom.d.ts" />
+/// <reference path="../node_modules/typescript/lib/lib.es2015.promise.d.ts" />
+
 import { Action, ActionDescription, ActionResult, Chain } from '..' 
 import { staticTree, executeTree } from '..'
 
