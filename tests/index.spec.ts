@@ -2,11 +2,11 @@
 /// <reference path="../node_modules/typescript/lib/lib.dom.d.ts" />
 /// <reference path="../node_modules/typescript/lib/lib.es2015.promise.d.ts" />
 
-import { Action, ActionDescription, ActionResult, Chain } from '..' 
+import { ActionFunc, ActionDescription, ActionResult, Chain } from '..' 
 import { staticTree, executeTree } from '..'
 
 function sync (name: string) { 
-  let action: Action = () => {}
+  let action: ActionFunc = () => {}
   action.displayName = name
   return action
 }
