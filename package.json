@@ -1,6 +1,6 @@
 {
   "name": "action-tree",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Behaviour tree for JS applications",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -11,7 +11,7 @@
     "build:tests": "tsc --sourceMap --outDir tests tests/index.spec.ts typings/main.d.ts",
     "pretest": "npm run build && npm run build:tests",
     "test": "node tests/index.spec.js",
-    "prepublish": "npm run build",
+    "prepublish": "npm run build && npm test",
     "watch": "tsc -w"
   },
   "author": "Alexey Gurianov <gurianov@gmail.com>",
