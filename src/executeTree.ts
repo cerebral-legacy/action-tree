@@ -19,9 +19,9 @@ export default function executeTree<T> (
 
     function processActionOutput (action: ActionDescription) {
       return (result: ActionResult<T>): T | Promise<T> => {
-        let newPayload = assign({}, payload, result.payload)
+        let newPayload = assign({}, payload, result ? result.payload : {})
 
-        if (action./* has */outputs) {
+        if (result && action./* has */outputs) {
           let outputs = Object.keys(action.outputs)
           if (~outputs.indexOf(result.path)) {
             return runBranch(action.outputs[result.path], 0, newPayload)
