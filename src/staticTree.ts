@@ -1,4 +1,4 @@
-import { Action, ActionDescription, ActionOutputs, Branch, Chain, ChainItem, ParallelActions } from './interfaces'
+import { ActionFunc, ActionDescription, ActionOutputs, Branch, Chain, ChainItem, ParallelActions } from './interfaces'
 
 type Path = Array<string | number>
 
@@ -9,18 +9,18 @@ function getFunctionName (fn: any) {
   return ret
 }
 
-function traverse (actions: Action[], item: Chain | ParallelActions, isChain: boolean): Branch
-function traverse (actions: Action[], item: Action, outputs: ActionOutputs, isSync: boolean): ActionDescription
-function traverse (actions: Action[], item: any, isChain?: any, isSync?: boolean): any {
+function traverse (actions: ActionFunc[], item: Chain | ParallelActions, isChain: boolean): Branch
+function traverse (actions: ActionFunc[], item: ActionFunc, outputs: ActionOutputs, isSync: boolean): ActionDescription
+function traverse (actions: ActionFunc[], item: any, isChain?: any, isSync?: boolean): any {
   if (Array.isArray(item) && typeof isChain === 'boolean') {
     return (item as Chain).map(function (subItem: ChainItem, index: number) {
       if (typeof subItem === 'function') {
         let nextSubItem = item[index + 1]
         if (!Array.isArray(nextSubItem) && typeof nextSubItem === 'object') {
           item.splice(index + 1, 1)
-          return traverse(actions, subItem as Action, nextSubItem, isChain)
+          return traverse(actions, subItem as ActionFunc, nextSubItem, isChain)
         } else {
-          return traverse(actions, subItem as Action, null, isChain)
+          return traverse(actions, subItem as ActionFunc, null, isChain)
         }
       } else if (Array.isArray(item) && isChain) {
         return traverse(actions, subItem as ParallelActions, false)
@@ -32,7 +32,7 @@ function traverse (actions: Action[], item: any, isChain?: any, isSync?: boolean
       return !!action
     })
   } else if (typeof item === 'function') {
-    let actionFunc: Action = item
+    let actionFunc: ActionFunc = item
     let outputs: ActionOutputs = isChain
     let action: ActionDescription = {
       name: actionFunc.displayName || getFunctionName(actionFunc),
@@ -59,7 +59,7 @@ function traverse (actions: Action[], item: any, isChain?: any, isSync?: boolean
 }
 
 export default function (signalChain: Chain) {
-  let actions: Action[] = []
+  let actions: ActionFunc[] = []
   var tree = traverse(actions, signalChain, true)
   return {
     tree: tree,

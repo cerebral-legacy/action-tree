@@ -1,13 +1,16 @@
 export type Chain = Array<ChainItem>
-export type ChainItem = Action | ActionOutputs | ParallelActions
-export type ParallelActions = Array<Action | ActionOutputs>
+export type ChainItem = ActionFunc | ActionOutputs | ParallelActions
+export type ParallelActions = Array<ActionFunc | ActionOutputs>
 export type Branch = Array<ActionDescription | ActionDescription[]> 
 
 export interface Action {
-  (): void
   async?: boolean
   displayName?: string
   outputs?: string[]
+}
+
+export interface ActionFunc extends Action {
+  (...args: any[]): void
 }
 
 export interface ActionOutputs {
