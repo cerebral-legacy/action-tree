@@ -5,12 +5,13 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "clean": "rimraf lib && rimraf tests/*.js*",
+    "clean": "rimraf lib",
+    "pretest": "npm run build",
+    "test": "tsc && nodeunit tests",
     "prebuild": "npm run clean && typings install",
     "build": "tsc",
-    "build:tests": "tsc --sourceMap --outDir tests tests/index.spec.ts typings/main.d.ts",
-    "pretest": "npm run build && npm run build:tests",
-    "test": "node tests/index.spec.js",
+    "pretest": "npm run build",
+    "test": "nodeunit tests",
     "prepublish": "npm run build && npm test",
     "watch": "tsc -w"
   },
@@ -19,6 +20,8 @@
   "devDependencies": {
     "rimraf": "^2.5.2",
     "typescript": "^1.9.0-dev.20160429",
+    "nodeunit": "^0.9.1",
+    "tslint": "^3.8.1",
     "typings": "^0.8.1"
   },
   "dependencies": {
