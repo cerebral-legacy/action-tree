@@ -37,7 +37,8 @@ function traverse (actions: ActionFunc[], item: any, isChain?: any, isSync?: boo
     let action: ActionDescription = {
       name: actionFunc.displayName || getFunctionName(actionFunc),
       isAsync: !!actionFunc.async,
-      actionIndex: actions.indexOf(actionFunc) === -1 ? (actions.push(actionFunc) - 1) : actions.indexOf(actionFunc)
+      actionIndex: actions.indexOf(actionFunc) === -1 ? (actions.push(actionFunc) - 1) : actions.indexOf(actionFunc),
+      actionFunc: actionFunc
     }
     if (!isSync && !action.isAsync) {
       throw new Error('Signal Tree - Only async actions is allowed to be in ParallelActions array')

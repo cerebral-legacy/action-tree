@@ -1,11 +1,11 @@
 export type Chain = Array<ChainItem>
 export type ChainItem = ActionFunc | ActionOutputs | ParallelActions
 export type ParallelActions = Array<ActionFunc | ActionOutputs>
-export type Branch = Array<ActionDescription | ActionDescription[]> 
+export type Branch = Array<ActionDescription | ActionDescription[]>
 
 export interface Action {
   async?: boolean
-  displayName?: string
+  displayName?: string,
   outputs?: string[]
 }
 
@@ -20,7 +20,8 @@ export interface ActionOutputs {
 export interface ActionDescription {
   name: string
   isAsync: boolean
-  actionIndex: number
+  actionIndex: number,
+  actionFunc: ActionFunc,
   outputs?: {
     [key: string]: Branch
   }
