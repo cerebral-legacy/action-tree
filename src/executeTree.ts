@@ -9,43 +9,48 @@ import assign = require('object-assign')
  */
 export default function executeTree<T> (
   tree: Branch,
-  resolveActionResult: (action: ActionDescription, payload: T) => Promise<ActionResult<T>>,
-  initialPayload: T
-): Promise<T> {
-  function runBranch (branch: Branch, index: number, payload: T): Promise<T> {
+  resolveActionResult: (action: ActionDescription, payload: T, next: (result: ActionResult<T>) => void) => void,
+  initialPayload: T,
+  end: (payload: T) => void
+): void {
+  function runBranch (branch: Branch, index: number, payload: T, nextBranch: (payload: T) => void): void {
     function runNextItem (result: T) {
-      return runBranch(branch, index + 1, result)
+      runBranch(branch, index + 1, result, nextBranch)
     }
 
-    function processActionOutput (action: ActionDescription) {
-      return (result: ActionResult<T>): T | Promise<T> => {
+    function processActionOutput (action: ActionDescription, outputResult: (payload: T) => void) {
+      return (result: ActionResult<T>): void => {
         let newPayload = assign({}, payload, result ? result.payload : {})
 
         if (result && action./* has */outputs) {
           let outputs = Object.keys(action.outputs)
           if (~outputs.indexOf(result.path)) {
-            return runBranch(action.outputs[result.path], 0, newPayload)
+            runBranch(action.outputs[result.path], 0, newPayload, outputResult)
           } else {
             throw new Error(`Signal Tree - action ${action.name} must use one of its possible outputs: ${outputs.join(', ')}.`)
           }
         } else {
-          return newPayload
+          outputResult(newPayload)
         }
       }
     }
 
     let currentItem = branch[index]
-
     if (/* end of Branch */!currentItem) {
-      return Promise.resolve(payload)
+      nextBranch ? nextBranch(payload) : end(payload)
     } else if (/* ParallelActions */Array.isArray(currentItem)) {
-      return Promise.all(currentItem.map((action: ActionDescription) =>
-        resolveActionResult(action, payload).then(processActionOutput(action))
-      )).then(/* merge */(results) => assign({}, ...results)).then(runNextItem)
+      const itemLength: number = currentItem.length
+      currentItem.reduce((payloads: any[], action: ActionDescription) => {
+        resolveActionResult(action, payload, processActionOutput(action, (payload) => {
+          payloads.push(payload)
+          if (payloads.length === itemLength) runNextItem(assign({}, ...payloads))
+        }))
+        return payloads;
+      }, [])
     } else {
-      return resolveActionResult(currentItem, payload).then(processActionOutput(currentItem)).then(runNextItem)
+      resolveActionResult(currentItem, payload, processActionOutput(currentItem, runNextItem))
     }
   }
 
-  return runBranch(tree, 0, initialPayload)
+  return runBranch(tree, 0, initialPayload, end)
 }

@@ -2,15 +2,15 @@
 /// <reference path="../node_modules/typescript/lib/lib.dom.d.ts" />
 /// <reference path="../node_modules/typescript/lib/lib.es2015.promise.d.ts" />
 
-import { ActionFunc, ActionDescription, ActionResult, Chain } from '..' 
+import { ActionFunc, ActionDescription, ActionResult, Chain } from '..'
 import { staticTree, executeTree } from '..'
 
-function sync (name: string) { 
+function sync (name: string) {
   let action: ActionFunc = () => {}
   action.displayName = name
   return action
 }
-function async (name: string) { 
+function async (name: string) {
   let action = sync(name)
   action.async = true
   return action
@@ -39,18 +39,22 @@ let signalChain: Chain = [
 ]
 
 let tree = staticTree(signalChain)
-console.log(JSON.stringify(tree.tree, null, 2))
 
-function runAction (action: ActionDescription, payload: any): Promise<ActionResult<any>> {
+function runAction (action: ActionDescription, payload: any, next: (result: ActionResult<any>) => void): void {
   let result: ActionResult<any> = {
-    payload: { [action.name]: action.actionIndex }
+    payload: {}
   }
+  payload.actions.push(action.name)
   if (action.outputs) {
     result.path = 'bar'
   }
-  return Promise.resolve(result)
+  if (action.isAsync) {
+    setTimeout(() => next(result))
+  } else {
+    next(result)
+  }
 }
 
-executeTree(tree.tree, runAction, { foo: 'bar' }).then((result) => {
+executeTree(tree.tree, runAction, { foo: 'bar', actions: [] }, (result) => {
   console.log(JSON.stringify(result, null, 2))
 })
