@@ -1,14 +1,14 @@
 {
   "name": "action-tree",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Behaviour tree for JS applications",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
     "clean": "rimraf lib && rimraf tests/*.js*",
-    "prebuild": "npm run clean && typings install",
+    "prebuild": "npm run clean",
     "build": "tsc",
-    "build:tests": "tsc --sourceMap --outDir tests tests/index.spec.ts typings/main.d.ts",
+    "build:tests": "tsc --sourceMap --outDir tests tests/index.spec.ts",
     "pretest": "npm run build && npm run build:tests",
     "test": "node tests/index.spec.js",
     "prepublish": "npm run build && npm test",
@@ -17,12 +17,12 @@
   "author": "Alexey Gurianov <gurianov@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "rimraf": "^2.5.2",
-    "typescript": "^1.9.0-dev.20160429",
-    "typings": "^0.8.1"
+    "@types/object-assign": "^4.0.28",
+    "rimraf": "^2.5.4",
+    "typescript": "^2.0.0"
   },
   "dependencies": {
-    "object-assign": "^4.0.1"
+    "object-assign": "^4.1.0"
   },
   "files": [
     "lib"

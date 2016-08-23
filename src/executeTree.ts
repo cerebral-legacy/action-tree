@@ -5,7 +5,6 @@ import assign = require('object-assign')
  * Executes static `tree` of actions with `initialPayload` using `resolveActionResult` function.
  * `ActionResult.payload` merged with payload from previous step to be passed to next one.
  * `ActionResult.path` defines which branch of action outputs to use if any.
- * @returns {Promise} resolved with output payload
  */
 export default function executeTree<T> (
   tree: Branch,
