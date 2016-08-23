@@ -2,13 +2,6 @@ import { ActionFunc, ActionDescription, ActionOutputs, Branch, Chain, ChainItem,
 
 type Path = Array<string | number>
 
-function getFunctionName (fn: any) {
-  var ret = fn.toString()
-  ret = ret.substr('function '.length)
-  ret = ret.substr(0, ret.indexOf('('))
-  return ret
-}
-
 function traverse (actions: ActionFunc[], item: Chain | ParallelActions, isChain: boolean): Branch
 function traverse (actions: ActionFunc[], item: ActionFunc, outputs: ActionOutputs, isSync: boolean): ActionDescription
 function traverse (actions: ActionFunc[], item: any, isChain?: any, isSync?: boolean): any {
@@ -35,7 +28,7 @@ function traverse (actions: ActionFunc[], item: any, isChain?: any, isSync?: boo
     let actionFunc: ActionFunc = item
     let outputs: ActionOutputs = isChain
     let action: ActionDescription = {
-      name: actionFunc.displayName || getFunctionName(actionFunc),
+      name: actionFunc.displayName,
       isAsync: !!actionFunc.async,
       actionIndex: actions.indexOf(actionFunc) === -1 ? (actions.push(actionFunc) - 1) : actions.indexOf(actionFunc),
       actionFunc: actionFunc
