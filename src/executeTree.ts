@@ -26,7 +26,7 @@ export default function executeTree<T> (
           if (~outputs.indexOf(result.path)) {
             runBranch(action.outputs[result.path], 0, newPayload, outputResult)
           } else {
-            throw new Error(`Signal Tree - action ${action.name} must use one of its possible outputs: ${outputs.join(', ')}.`)
+            throw new Error(`Action Tree - action ${action.name} must use one of its possible outputs: ${outputs.join(', ')}.`)
           }
         } else {
           outputResult(newPayload)

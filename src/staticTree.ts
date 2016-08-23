@@ -41,13 +41,13 @@ function traverse (actions: ActionFunc[], item: any, isChain?: any, isSync?: boo
       actionFunc: actionFunc
     }
     if (!isSync && !action.isAsync) {
-      throw new Error('Signal Tree - Only async actions is allowed to be in ParallelActions array')
+      throw new Error('Action Tree - Only async actions is allowed to be in ParallelActions array')
     }
     if (outputs) {
       action.outputs = {}
       Object.keys(outputs).forEach(function (key) {
         if (actionFunc.outputs && !~actionFunc.outputs.indexOf(key)) {
-          throw new Error(`Signal Tree - Outputs object doesn\'t match list of possible outputs defined for action.`)
+          throw new Error(`Action Tree - Outputs object doesn\'t match list of possible outputs defined for action.`)
         }
         action.outputs[key] = traverse(actions, outputs[key], true)
       })
@@ -55,7 +55,7 @@ function traverse (actions: ActionFunc[], item: any, isChain?: any, isSync?: boo
 
     return action
   } else {
-    throw new Error('Signal Tree - Unexpected entry in signal chain')
+    throw new Error('Action Tree - Unexpected entry in signal chain')
   }
 }
 
