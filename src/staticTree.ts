@@ -6,6 +6,7 @@ function traverse (actions: ActionFunc[], item: Chain | ParallelActions, isChain
 function traverse (actions: ActionFunc[], item: ActionFunc, outputs: ActionOutputs, isSync: boolean): ActionDescription
 function traverse (actions: ActionFunc[], item: any, isChain?: any, isSync?: boolean): any {
   if (Array.isArray(item) && typeof isChain === 'boolean') {
+    item = item.slice()
     return (item as Chain).map(function (subItem: ChainItem, index: number) {
       if (typeof subItem === 'function') {
         let nextSubItem = item[index + 1]
