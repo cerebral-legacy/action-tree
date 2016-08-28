@@ -97,10 +97,10 @@ myFunctionTree({url: '/data'})
 
 Our functions, in spite of them doing side effects, are now testable. They are testable because everything they operate on is on the context argument passed in. They can also be composed into any other function tree. But more importantly the declarative representation of the tree has no distractions and can increase almost endlessly in complexity without affecting readability. It is much like a decision tree we use so often to gather our thoughts on different paths can be taken.
 
-When the function tree is instantiated we extend the context of it with the window and request object. This context object is available to all the functions of the function tree. By default **input** and **output** is already defined. **Input** holds the current payload to function and **output** lets you output a new payload which will be merged with the current. **Output** can also execute a specific path, if defined in the tree. The **getData** function also has an *async* property to flag it as async. When async functions becomes native to JavaScript (ES7) that will no longer be necessary.
+When the function tree is instantiated we extend the context of it with the window and request object. This context object is available to all the functions of the function tree. By default **input** and **output** is already defined. **Input** holds the current payload and **output** lets you output a new payload which will be merged with the current. **Output** can also execute a specific path, if defined in the tree. The **getData** function also has an *async* property to flag it as async. When async functions becomes native to JavaScript (ES7) that will no longer be necessary.
 
 ### How does this differ from rxjs and promises?
-Both Rxjs and Promises are about execution control, but neither of them have conditional execution paths. Like the example above we were able to diverge our execution down the `success` or `error` path. When working with side effects they very often have two possible outcomes, which traditionally can not be expressed declaratively. But conditional execution can also be related to things like:
+Both Rxjs and Promises are about execution control, but neither of them have conditional execution paths. Like the example above we were able to diverge our execution down the `success` or `error` path. When working with side effects they very often have two possible outcomes, which traditionally can not be expressed declaratively, you have to write an IF statement. Conditional execution can also be related to things like:
 
 ```js
 [
@@ -114,7 +114,7 @@ Both Rxjs and Promises are about execution control, but neither of them have con
 
 Here we create a function that will diverge execution based on the user role.
 
-Rxjs and Promises are also based on value transformation. That means only the value returned from the previous function is available in the next. This is very powerful when you indeed want to transform values, but events in your application are rarely about value transformation, they are about running side effects and going through one of multiple execution paths. And that is where **function-tree** differs. It embraces the fact that most of what we do in application development is running side effects.
+Rxjs and Promises are also based on value transformation. That means only the value returned from the previous function is available in the next. This works when you indeed want to transform values, but events in your application are rarely about value transformation, they are about running side effects and going through one of multiple execution paths. And that is where **function-tree** differs. It embraces the fact that most of what we do in application development is running side effects.
 
 ### Factories and composing
 When you have a declarative approach the concept of factories and composition becomes very apparent. For example doing a request could be a factory using:
@@ -182,8 +182,8 @@ The fact that a context is created for each function gives a natural hook for si
 Testing functions used in a function tree is as simple as just calling them and provide a context. For example:
 
 ```js
-function setData({input, window}) {
-  window.app.data = input.result
+function setData(context) {
+  context.window.app.data = context.input.result
 }
 ```
 
@@ -204,7 +204,7 @@ When you want to test the whole function tree execution you can do:
 ```js
 const FunctionTree = require('function-tree')
 const loadApp = require('app/loadApp')
-const loadApp = require('tests/MockedRequest')
+const MockedRequest = require('tests/MockedRequest')
 
 const window = {app: {}}
 const request = new MockedRequest('/data', {data: 'foo'})
@@ -311,8 +311,8 @@ Context providers lets us do some pretty amazing things. The debugger for **func
 ```js
 import FunctionTree from 'function-tree'
 
-function funcA({input, output}) {
-  input.foo // "bar"
+function funcA(context) {
+  context.input.foo // "bar"
 }
 
 const myFunction = new FunctionTree([
@@ -327,14 +327,14 @@ myFunction({foo: 'bar'})
 ```js
 import FunctionTree from 'function-tree'
 
-function funcA({input, output}) {
-  input.foo // "bar"
-  output.pathA({foo2: 'bar2'})
+function funcA(context) {
+  context.input.foo // "bar"
+  context.output.pathA({foo2: 'bar2'})
 }
 
-function funcB({input, output}) {
-  input.foo // "bar"
-  input.foo2 // "bar2"
+function funcB(context) {
+  context.input.foo // "bar"
+  context.input.foo2 // "bar2"
 }
 
 const myFunction = new FunctionTree([
