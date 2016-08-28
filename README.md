@@ -9,7 +9,7 @@ Callback hell is a common term which says something about how asynchronous code 
 
 So a function tree will help you execute synchronous and asynchronous functions in a declarative, composable and testable way. **Declarative** means that you can describe an execution without writing any implementation, increasing readability of the code. **Composable** means that some part of one execution can be reused in an other execution. And **testable** means that you will write your code in a way where the whole chain of execution and its individual parts can be tested.
 
-We often talk about pure functions as the holy grail for giving our code these attributes, but pure functions means "no side effects"... but most of the things we do in real applications is running side effects of some sorts. **function-tree** does not push side effects to the edge of your app. The execution runs exactly how you think about it, one after the other, but keeps the important traits of pure functions. **Declarative, composable and testable**.
+We often talk about pure functions as the holy grail for giving our code these attributes, but pure functions means "no side effects"... but most of the things we do in real applications is running side effects of some sorts. **function-tree** does not push side effects to the edge of your app. The execution runs exactly how you think about it, one step after the other, but keeps the important traits of pure functions. **Declarative, composable and testable** code.
 
 ### A small example
 Instead of writing a function:
@@ -61,35 +61,19 @@ const myFunctionTree = new FunctionTree(tree)
 But what about testability? You would have a very hard time creating a test for the first function we wrote above. Let us explore how the functions in a function tree run.
 
 ```js
-// The functions of a function tree are passed a context, the
-// only argument available. Typically you would destructure it.
-function getData({input, request, output}) {
-  // The input holds the initial payload passed into
-  // the function tree and will be merged with any outputs
-  // of previous functions. This is by default. Request
-  // is NOT default and we will look later at how this is exposed
-  request(input.url)
-    // Since there is a success and error path defined
-    // in the function tree after this function it is able
-    // to call those two paths as methods on the output.
-    // Output is also default
-    .then(output.sucess)
-    .catch(output.error)
+function getData(context) {
+  request(context.input.url)
+    .then(context.output.sucess)
+    .catch(context.output.error)
 }
-// Until async functions becomes native to JavaScript you
-// have to set an async flag on functions running asynchronously.
-// This is necessary for the function tree to know when to progress
-// instantly, and when to wait for an output
 getData.async = true
 
-// Like request above, we also have window available on
-// the context of this function. We will look into this below
-function setData({input, window}) {
-  window.app.data = input.result
+function setData(context) {
+  context.window.app.data = context.input.result
 }
 
-function setError({input, window}) {
-  window.app.error = input.error
+function setError(context) {
+  context.window.app.error = context.input.error
 }
 
 const tree = [
@@ -103,8 +87,6 @@ const tree = [
   }
 ]
 
-// When we instantiate our function tree we pass
-// it additional context. The request and window object
 const myFunctionTree = new FunctionTree({
   request,
   window
@@ -114,6 +96,8 @@ myFunctionTree({url: '/data'})
 ```
 
 Our functions, in spite of them doing side effects, are now testable. They can also be composed into any other function tree. But more importantly the declarative representation of the tree has no distractions and can increase almost endlessly in complexity without affecting readability. It is much like a decision tree we use so often to gather our thoughts on different paths can be taken.
+
+When the function tree is instantiated we extend the context of it with the window and request object. This context object is available to all the functions of the function tree. By default **input** and **output** is already defined. **Input** holds the current payload to function and **output** lets you output a new payload which will be merged with the current. **Output** can also execute a specific path, if defined in the tree. The **getData** function also has an *async* property to flag it as async. When async functions becomes native to JavaScript (ES7) that will no longer be necessary.
 
 ### How does this differ from rxjs and promises?
 Both Rxjs and Promises are about execution control, but neither of them have conditional execution paths. Like the example above we were able to diverge our execution down the `success` or `error` path. When working with side effects they very often have two possible outcomes, which traditionally can not be expressed declaratively. But conditional execution can also be related to things like:
