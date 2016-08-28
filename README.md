@@ -7,9 +7,9 @@ Readable and maintainable code is a never ending quest. With the increased compl
 
 Callback hell is a common term which says something about how asynchronous code execution affects readability and maintainability of our code bases, but testability and reusability of code is also an important factor which is difficult to achieve as complexity increases.
 
-So a function tree will help you execute synchronous and asynchronous functions in a declarative, composable and testable way. **Declarative** means that you can describe an execution without writing any implementation, increasing readability of the code. **Composable** means that some part of one execution can be reused in an other execution. And **testable** of course means that you need to write your execution code in a way where the whole chain of execution and its individual parts can be tested.
+So a function tree will help you execute synchronous and asynchronous functions in a declarative, composable and testable way. **Declarative** means that you can describe an execution without writing any implementation, increasing readability of the code. **Composable** means that some part of one execution can be reused in an other execution. And **testable** of course means that you need to write your code in a way where the whole chain of execution and its individual parts can be tested.
 
-We often talk about pure functions as the holy grail for giving our code these attributes, but pure functions means "no side effects"... but most of the things we do in real applications is running side effects of some sorts. **function-tree** does not push side effects to the edge of your app. The execution runs exactly how you think about it, one after the other, but keeps the important traits of pure functions. **Declarative, composable and testable code**.
+We often talk about pure functions as the holy grail for giving our code these attributes, but pure functions means "no side effects"... but most of the things we do in real applications is running side effects of some sorts. **function-tree** does not push side effects to the edge of your app. The execution runs exactly how you think about it, one after the other, but keeps the important traits of pure functions. **Declarative, composable and testable**.
 
 ### A small example
 Instead of writing a function:
@@ -130,7 +130,7 @@ Both Rxjs and Promises are about execution control, but neither of them have con
 
 Here we create a function that will diverge execution based on the user role.
 
-Rxjs and Promises are also based on value transformation. That means only the value returned from the previous function is available in the next. This is very powerful when you indeed want to transform values, but events in your application are rarely about value transformation, they are about controlling side effects and going through one of multiple execution paths. And that is where **function-tree** differs. It embraces the fact that most of what we do in application development is running side effects.
+Rxjs and Promises are also based on value transformation. That means only the value returned from the previous function is available in the next. This is very powerful when you indeed want to transform values, but events in your application are rarely about value transformation, they are about running side effects and going through one of multiple execution paths. And that is where **function-tree** differs. It embraces the fact that most of what we do in application development is running side effects.
 
 ### Factories and composing
 When you have a declarative approach the concept of factories and composition becomes very apparent. For example doing a request could be a factory using:
