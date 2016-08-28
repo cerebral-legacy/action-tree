@@ -362,3 +362,26 @@ const myFunction = new FunctionTree([
 
 myFunction({foo: 'bar'})
 ```
+
+#### Events
+Each function tree is an event emitter.
+
+```js
+import FunctionTree from 'function-tree'
+
+const myFunction = new FunctionTree([
+  funcA
+])
+
+// When the function tree is executed
+myFunction.on('start', () => {})
+
+// When the function tree ends its execution
+myFunction.on('end', () => {})
+
+// When a function in the function tree starts executing
+myFunction.on('functionStart', (execution) => {})
+
+// When a function in the function tree stops executing
+myFunction.on('functionEnd', (execution) => {})
+```
