@@ -194,6 +194,47 @@ When you instantiate a function tree it will run through the tree checking the f
 
 The fact that a context is created for each function gives a natural hook for side effects. You can configure your function trees to handle everything from Redux dispatchers, to firebase, mobx models, ember data, mongodb on the server etc. It does not matter, function tree is completely agnostic to this.
 
+### Testing
+Testing functions used in a function tree is as simple as just calling them and provide a context. For example:
+
+```js
+function setData({input, window}) {
+  window.app.data = input.result
+}
+```
+
+The test would be:
+
+```js
+const mockedWindow = { app: {}}
+setData({
+  input: {result: 'foo'},
+  window: mockedWindow
+})
+
+test.deepEqual(mockedWindow, {app: {data: 'foo'}})
+```
+
+When you want to test the whole function tree execution you can do:
+
+```js
+const FunctionTree = require('function-tree')
+const loadApp = require('app/loadApp')
+const loadApp = require('tests/MockedRequest')
+
+const window = {app: {}}
+const request = new MockedRequest('/data', {data: 'foo'})
+const functionTree = new FunctionTree({
+  window,
+  request
+}, loadApp)
+
+functionTree.on('end', () => {
+  test.deepEquals(window, {app: {data: 'foo'}})
+})
+functionTree({url: '/data'})
+```
+
 ### API
 
 #### Create an instance
