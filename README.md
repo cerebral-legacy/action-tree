@@ -95,7 +95,7 @@ const myFunctionTree = new FunctionTree({
 myFunctionTree({url: '/data'})
 ```
 
-Our functions, in spite of them doing side effects, are now testable. They are testable because everything the operator on is part of the context. They can also be composed into any other function tree. But more importantly the declarative representation of the tree has no distractions and can increase almost endlessly in complexity without affecting readability. It is much like a decision tree we use so often to gather our thoughts on different paths can be taken.
+Our functions, in spite of them doing side effects, are now testable. They are testable because everything they operate on is on the context argument passed in. They can also be composed into any other function tree. But more importantly the declarative representation of the tree has no distractions and can increase almost endlessly in complexity without affecting readability. It is much like a decision tree we use so often to gather our thoughts on different paths can be taken.
 
 When the function tree is instantiated we extend the context of it with the window and request object. This context object is available to all the functions of the function tree. By default **input** and **output** is already defined. **Input** holds the current payload to function and **output** lets you output a new payload which will be merged with the current. **Output** can also execute a specific path, if defined in the tree. The **getData** function also has an *async* property to flag it as async. When async functions becomes native to JavaScript (ES7) that will no longer be necessary.
 
