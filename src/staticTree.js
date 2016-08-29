@@ -7,7 +7,7 @@ function getFunctionName (fn) {
   return ret
 }
 
-function traverse (functions, item, isChain, isSync) {
+function traverse (functions, item, isChain) {
   if (Array.isArray(item) && typeof isChain === 'boolean') {
     item = item.slice()
     return item.map(function (subItem, index) {
@@ -15,9 +15,9 @@ function traverse (functions, item, isChain, isSync) {
         let nextSubItem = item[index + 1]
         if (!Array.isArray(nextSubItem) && typeof nextSubItem === 'object') {
           item.splice(index + 1, 1)
-          return traverse(functions, subItem, nextSubItem, isChain)
+          return traverse(functions, subItem, nextSubItem)
         } else {
-          return traverse(functions, subItem, null, isChain)
+          return traverse(functions, subItem, null)
         }
       } else if (Array.isArray(item) && isChain) {
         return traverse(functions, subItem, false)
@@ -31,12 +31,8 @@ function traverse (functions, item, isChain, isSync) {
     let outputs = isChain
     let funcDetails = {
       name: func.displayName || getFunctionName(func),
-      isAsync: !!func.async,
       functionIndex: functions.indexOf(func) === -1 ? (functions.push(func) - 1) : functions.indexOf(func),
       function: func
-    }
-    if (!isSync && !funcDetails.isAsync) {
-      throw new Error('function-tree - Only async functions is allowed to be in ParallelFunctions array')
     }
     if (outputs) {
       funcDetails.outputs = {}
