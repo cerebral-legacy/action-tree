@@ -9,7 +9,7 @@ Callback hell is a common term which says something about how asynchronous code 
 
 So a function tree will help you execute synchronous and asynchronous functions in a declarative, composable and testable way. **Declarative** means that you can describe an execution without writing any implementation, increasing readability of the code. **Composable** means that some part of one execution can be reused in an other execution. And **testable** means that you will write your code in a way where the whole chain of execution and its individual parts can be tested.
 
-We often talk about pure functions as the holy grail for giving our code these attributes, but pure functions means "no side effects"... but most of the things we do in real applications is running side effects of some sorts. **function-tree** does not push side effects to the edge of your app. The execution runs exactly how you think about it, one step after the other, but keeps the important traits of pure functions. **Declarative, composable and testable** code.
+We often talk about pure functions as the holy grail for giving our code these attributes, but pure functions means "no side effects" which is contradictory, as most of the things we do in real applications is running side effects of some sorts. **function-tree** does not push side effects to the edge of your app. The execution runs exactly how you think about it, one step after the other, but keeps the important traits of pure functions. Writing **Declarative, composable and testable** code.
 
 ### A small example
 Instead of writing a function:
@@ -62,11 +62,10 @@ But what about testability? You would have a very hard time creating a test for 
 
 ```js
 function getData(context) {
-  request(context.input.url)
-    .then(context.output.sucess)
-    .catch(context.output.error)
+  return context.request(context.input.url)
+    .then(context.result.sucess)
+    .catch(context.result.error)
 }
-getData.async = true
 
 function setData(context) {
   context.window.app.data = context.input.result
@@ -95,12 +94,12 @@ const myFunctionTree = new FunctionTree({
 myFunctionTree({url: '/data'})
 ```
 
-Our functions, in spite of them doing side effects, are now testable. They are testable because everything they operate on is on the context argument passed in. They can also be composed into any other function tree. But more importantly the declarative representation of the tree has no distractions and can increase almost endlessly in complexity without affecting readability. It is much like a decision tree we use so often to gather our thoughts on different paths can be taken.
+Our functions, in spite of them doing side effects, are now testable. They are testable because everything they operate on is on the context argument passed in. They can also be composed into any other function tree. But more importantly the declarative representation of the tree has no distractions and can increase almost endlessly in complexity without affecting readability. It is much like a decision tree we use to build mental images of complex scenarios and their possible outcomes.
 
-When the function tree is instantiated we extend the context of it with the window and request object. This context object is available to all the functions of the function tree. By default **input** and **output** is already defined. **Input** holds the current payload and **output** lets you output a new payload which will be merged with the current. **Output** can also execute a specific path, if defined in the tree. The **getData** function also has an *async* property to flag it as async. When async functions becomes native to JavaScript (ES7) that will no longer be necessary.
+When the function tree is instantiated we extend the context of it with the window and request object. This context object is available to all the functions of the function tree. By default **input** and **output** is already defined. **Input** holds the current payload. **Result** is a function that builds an object you optionally return from the function. This returned object describes what payload to pass on to the next function and if any path should be executed. When the function returns a promise it will wait for the promise to resolve before moving on. You can also use ES7 async functions to do the same. Just return a **result**.
 
 ### How does this differ from rxjs and promises?
-Both Rxjs and Promises are about execution control, but neither of them have conditional execution paths. Like the example above we were able to diverge our execution down the `success` or `error` path. When working with side effects they very often have two possible outcomes, which traditionally can not be expressed declaratively, you have to write an IF statement. Conditional execution can also be related to things like:
+Both Rxjs and Promises are about execution control, but neither of them have conditional execution paths. Like the example above we were able to diverge our execution down the `success` or `error` path. When working with side effects they very often have two or more possible outcomes, which traditionally can not be expressed declaratively, you have to write an IF or SWITCH statement. Conditional execution can also be related to things like:
 
 ```js
 [
@@ -174,9 +173,9 @@ const loadApp = [
 ```
 
 ### What happens when a function tree executes?
-When you instantiate a function tree it will run through the tree checking the functions for the async flag, them being grouped for parallel execution and any paths. This gives a static representation of the tree which can be passed to debuggers to visualize it. When the function tree actually executes it will produce the context for each function and wait for it to finish, being async or not. Then it continues to the next function.
+When you instantiate a function tree it will run through the tree checking the functions for the async flag, them being grouped for parallel execution and any paths. This gives a static representation of the tree which can be passed to debuggers to visualize it. When the function tree actually executes it will produce the context for each function and wait for it to finish. Then it continues to the next function.
 
-The fact that a context is created for each function gives a natural hook for side effects. You can configure your function trees to handle everything from Redux dispatchers, to firebase, mobx models, ember data, mongodb on the server etc. It does not matter, function tree is completely agnostic to this.
+The fact that a context is created for each function gives a lot of flexibility. You can configure your function trees to handle everything from Redux dispatchers, to firebase, mobx models, ember data, mongodb on the server etc. It does not matter, function tree is completely agnostic to this.
 
 ### Testing
 Testing functions used in a function tree is as simple as just calling them and provide a context. For example:
@@ -279,12 +278,10 @@ const MyFunctionTree = FunctionTree.bind(null, [
     window
   },
   // A function gives you some more details
-  function MyContextProvider(context, payload, execution, next) {
+  function MyContextProvider(context, payload, execution) {
     context // Current context
     context.input // Input created by the InputProvider (default)
-    context.output // Output created by the OutputProvider (default)
-    context._instance.staticTree // The static tree representation of the function tree
-    context._instance.id // Unique id of the running function tree
+    context.result // Result created by the ResultProvider (default)
 
     payload // The current payload (Used by InputProvider)
 
@@ -292,7 +289,9 @@ const MyFunctionTree = FunctionTree.bind(null, [
     execution.func // A reference to the running function
     execution.isAsync // Flag of it being async or not
 
-    next // Continue to next function (Used by OutputProvider)
+    context._instance.id // Function tree id
+    context._instance.executionId // Current execution id
+    context._instance.staticTree // The static representation of the tree
 
     return context // Always return the changed context
   }
@@ -322,24 +321,39 @@ const myFunction = new FunctionTree([
 myFunction({foo: 'bar'})
 ```
 
-#### Output (default context provider)
+#### Result (default context provider)
 
 ```js
 import FunctionTree from 'function-tree'
 
 function funcA(context) {
   context.input.foo // "bar"
-  context.output.pathA({foo2: 'bar2'})
+  return context.result.pathA({foo2: 'bar2'})
 }
 
 function funcB(context) {
   context.input.foo // "bar"
   context.input.foo2 // "bar2"
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(context.result({foo3: 'bar3'}))
+    }, 100)
+  })
+}
+
+function funcC(context) {
+  context.input.foo // "bar"
+  context.input.foo2 // "bar2"
+  context.input.foo3 // "bar3"
 }
 
 const myFunction = new FunctionTree([
   funcA, {
-    pathA: [funcB],
+    pathA: [
+      funcB,
+      funcC
+    ],
     pathB: []
   }
 ])

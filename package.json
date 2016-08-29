@@ -2,15 +2,14 @@
   "name": "action-tree",
   "version": "0.1.1",
   "description": "Behaviour tree for JS applications",
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
     "clean": "rimraf lib && rimraf tests/*.js*",
     "prebuild": "npm run clean",
     "build": "tsc",
     "build:tests": "tsc --sourceMap --outDir tests tests/index.spec.ts",
-    "pretest": "npm run build && npm run build:tests",
-    "test": "node tests/index.spec.js",
+    "test": "nodeunit tests",
     "prepublish": "npm run build && npm test",
     "watch": "tsc -w"
   },
