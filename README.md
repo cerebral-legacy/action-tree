@@ -63,7 +63,7 @@ But what about testability? You would have a very hard time creating a test for 
 ```js
 function getData(context) {
   return context.request(context.input.url)
-    .then(context.result.sucess)
+    .then(context.result.success)
     .catch(context.result.error)
 }
 
@@ -96,7 +96,7 @@ myFunctionTree({url: '/data'})
 
 Our functions, in spite of them doing side effects, are now testable. They are testable because everything they operate on is on the context argument passed in. They can also be composed into any other function tree. But more importantly the declarative representation of the tree has no distractions and can increase almost endlessly in complexity without affecting readability. It is much like a decision tree we use to build mental images of complex scenarios and their possible outcomes.
 
-When the function tree is instantiated we extend the context of it with the window and request object. This context object is available to all the functions of the function tree. By default **input** and **output** is already defined. **Input** holds the current payload. **Result** is a function that builds an object you optionally return from the function. This returned object describes what payload to pass on to the next function and if any path should be executed. When the function returns a promise it will wait for the promise to resolve before moving on. You can also use ES7 async functions to do the same. Just return a **result**.
+When the function tree is instantiated we extend the context of it with the window and request object. This context object is available to all the functions of the function tree. By default **input** and **result** is already defined. **Input** holds the current payload. **Result** is a function that builds an object you optionally return from the function. This returned object describes what payload to pass on to the next function and if any path should be executed. When the function returns a promise it will wait for the promise to resolve before moving on. You can also use ES7 async functions to do the same. Just return a **result**.
 
 ### How does this differ from rxjs and promises?
 Both Rxjs and Promises are about execution control, but neither of them have conditional execution paths. Like the example above we were able to diverge our execution down the `success` or `error` path. When working with side effects they very often have two or more possible outcomes, which traditionally can not be expressed declaratively, you have to write an IF or SWITCH statement. Conditional execution can also be related to things like:
