@@ -4,6 +4,7 @@ function InstanceProvider(execution) {
       id: execution.functionTree.id,
       name: execution.functionTree.name,
       executionId: execution.id,
+      datetime: execution.datetime,
       staticTree: execution.functionTree.staticTree
     }
 

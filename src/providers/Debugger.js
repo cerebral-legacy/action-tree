@@ -57,15 +57,9 @@ module.exports = function () {
           functionIndex: functionDetails.functionIndex,
           staticTree: context._instance.staticTree,
           payload: payload,
+          datetime: context._instance.datetime,
           data: data
         })
-        /*
-          data: {
-            method: 'state.set', // Displayed with color
-            color: '#12345', // Color of method
-            args: [], // Each displayed with object inspector
-          }
-        */
       }
     }
 

@@ -30,6 +30,7 @@ function isValidResult(result) {
 function FunctionTreeExecution(functionTree) {
   this.id = functionTree.nextExecutionId()
   this.functionTree = functionTree
+  this.datetime = Date.now()
 
   this.runFunction = this.runFunction.bind(this)
 }
